@@ -1,0 +1,13 @@
+<%= simple_form_for(@filter_param) do |f| %>
+  <%= f.error_notification %>
+
+  <div class="inputs">
+    <%= f.input :report_id %>
+    <%= f.input :filter_param_type %>
+    <%= f.input :column %>
+  </div>
+
+  <div class="actions">
+    <%= f.button :submit %>
+  </div>
+<% end %>

@@ -1,0 +1,209 @@
+<%= simple_form_for @report, :html => {:class => 'dev'} do |form| %>
+  <%= form.input :report_type, :as => :hidden %>
+  <%= form.input :name %>
+  <%= form.input :tag_list, :hint => '(separate by commas)' %>
+
+  <% if is_global_admin?(current_user) %>
+    <div class="col-4 global-admin">
+
+      <div id="popupRegionChooser">
+        <div id="popupRegionChooserTitleBar">
+          <a id="popupRegionChooserClose">x</a>
+          <h1>Heat Maps Region Chooser<BR><small>(<I>Choose the desired area via pan/zoom... then dismiss this dialog...</I>)</small></h1>
+        </div>
+          <div id="map_canvas" style="width:100%;"></div>
+      </div>
+      <div id="backgroundRegionChooserPopup"></div>
+
+      <%= form.input :table_columns, :hint => '(separate by commas)' %>
+      <%= form.collection_radio :sample_option, Query::Sample.options, :first, :last %>
+
+      <div id="filter_params" class="sub-form">
+        <h3>Filter Params</h3>
+        <%= form.simple_fields_for :filter_params do |filter_param| %>
+          <%= render 'filter_param_fields', :f => filter_param %>
+        <% end %>
+        <div class="links">
+          <%= link_to_add_association 'create filter param', form, :filter_params %>
+        </div>
+      </div>
+
+      <div id="filter_prefs" class="sub-form">
+        <h3>Filter Prefs</h3>
+        <%= form.simple_fields_for :filter_prefs do |filter_prefs| %>
+          <%= render 'filter_pref_fields', :f => filter_prefs %>
+        <% end %>
+        <div class="links">
+          (@@@)
+          <%= link_to_add_heat_maps_association 'create filter pref', form, :filter_prefs %>
+        </div>
+      </div>
+
+      <script language="JavaScript" type="text/javascript">
+        var __map_bounds__ = "???";
+        var __map_center__ = "???";
+        var __map_zoom__ = "???";
+        var __map_target_text__ = '???';
+        var __map_target_links__ = '???';
+        var __map_json__ = '';
+        var __interval_wait_for_heat_map_target__ = -1;
+        function initialize_map_instance() {
+            var ele_busy = $("#ajaxBusy");
+            if (ele_busy.length == 0) {
+                $('body').append('<div id="ajaxBusy"><p><img src="/static/activity/ajax-loader.gif"></p></div>');
+                $('#ajaxBusy').css({
+                    display:"none",
+                    margin:"0px",
+                    paddingLeft:"0px",
+                    paddingRight:"0px",
+                    paddingTop:"0px",
+                    paddingBottom:"0px",
+                    position:"fixed",
+                    right:"50%",
+                    top:"50%",
+                    width:"auto"
+                });
+            }
+            $('#ajaxBusy').show();
+            var __defaultLatLng__ = new google.maps.LatLng(37.331789, -122.029620);
+            var myOptions = {
+                zoom: 8,
+                maxZoom: 15,
+                minZoom: 8,
+                streetViewControl: false,
+                center: __defaultLatLng__,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            }
+            var c = document.getElementById("map_canvas");
+            if (c) {
+                var tb_ele = $("#popupRegionChooserTitleBar");
+                var h_tb = tb_ele.height();
+                h_tb = (h_tb == 0) ? 60 : h_tb;
+                var ele = $("#popupRegionChooser");
+                var h = ele.height();
+                h = (h == 0) ? 500 : h;
+                $('#map_canvas').css('height',h-h_tb-20);
+                __map__ = new google.maps.Map(c, myOptions);
+                google.maps.event.addListener(__map__, 'tilesloaded', function() {
+                    $('#ajaxBusy').hide();
+                });
+                function update_map_params() {
+                    __map_bounds__ = __map__.getBounds();
+                    __map_center__ = __map__.getCenter();
+                    __map_zoom__ = __map__.getZoom();
+                    __map_json__ = "{'zoom':"+__map_zoom__+",'center':"+__map_center__.toString()+",'bounds':"+__map_bounds__.toString()+"}";
+                }
+                google.maps.event.addListener(__map__, 'zoom_changed', function() {
+                    update_map_params();
+                    //alert('Zoom Event:\n'+__map_json__);
+                });
+                google.maps.event.addListener(__map__, 'bounds_changed', function() {
+                    update_map_params();
+                    //alert('Bounds Event:\n'+__map_json__);
+                });
+                google.maps.event.addListener(__map__, 'center_changed', function() {
+                    update_map_params();
+                    //alert('Center Event:\n'+__map_json__);
+                });
+            } else {
+                alert('WARNING: Unable to locate the map_canvas HTML object.');
+            }
+        }
+        function initialize_google_maps() {
+            var script1 = document.createElement("script");
+            script1.type = "text/javascript";
+            script1.src = "http://maps.google.com/maps/api/js?v=3.4&libraries=geometry&sensor=false&callback=initialize_map_instance";
+            document.body.appendChild(script1);
+        }
+        function wait_for_heat_map_target() {
+            var ele = $("#report_filter_prefs_attributes_new_filter_prefs_values");
+            if (ele.length > 0) {
+                var t = ele.last();
+                if (__interval_wait_for_heat_map_target__ > -1) {
+                    window.clearInterval(__interval_wait_for_heat_map_target__);
+                    __interval_wait_for_heat_map_target__ = -1;
+                }
+                t.val(__map_json__);
+            }
+        }
+        function dismiss_region_chooser_dialog() {
+            disablePopup($('#popupRegionChooser'),$('#backgroundRegionChooserPopup'));
+            __map_target_text__.nodeValue = "";
+            if (__interval_wait_for_heat_map_target__ == -1) {
+                __interval_wait_for_heat_map_target__ = window.setInterval(function() {wait_for_heat_map_target();}, 125);
+            }
+            //alert('INFO: '+__map_target_text__.nodeValue);
+        }
+        $("#popupRegionChooserClose").click(function(){
+            dismiss_region_chooser_dialog();
+        });
+        $("#backgroundRegionChooserPopup").click(function(){
+            dismiss_region_chooser_dialog();
+        });
+        $(".add_fields").click(
+            function(obj) {
+                try {
+                    var t = obj.target;
+                    var ti = t.id;
+                    var tn = t.name;
+                    var te = t.text;
+                    var ta = t.attributes;
+                    var ele;
+                    var _already_exists_ = false;
+                    var _n_;
+                    var _foo_;
+                    $("#filter_prefs").each(
+                        function(i,ele) {
+                            __map_target_links__ = ele.children[ele.children.length-1];
+                            __map_target_text__ = __map_target_links__.firstChild;
+                            if (!__map_target_text__) {
+                                alert('WARNING: Something has gone wrong...');
+                            } else {
+                                $("#report_filter_prefs_attributes_new_filter_prefs_values").each(
+                                    function(n,element) {
+                                        _n_ = element.value;
+                                        if ( (_n_.indexOf("'zoom':") > -1) && (_n_.indexOf("'center':") > -1) && (_n_.indexOf("'bounds':") > -1) ) {
+                                            _already_exists_ = true;
+                                        }
+                                    }
+                                );
+                                if (!_already_exists_) {
+                                    __map_target_text__.nodeValue = "(???)";
+                                    popupStatus = 0;
+                                    var __chooser__ = $('#popupRegionChooser');
+                                    var __background__ = $('#backgroundRegionChooserPopup');
+                                    centerPopup(__chooser__,__background__,false);
+                                    loadPopup(__chooser__,__background__);
+                                    initialize_google_maps();
+                                }
+                            }
+                        }
+                    );
+                } catch (e) {alert(e.toString());}
+            }
+        );
+      </script>
+
+      <div id="report_queries" class="sub-form">
+        <h3>Queries</h3>
+        <%= form.simple_fields_for :report_queries do |report_query| %>
+          <%= render 'report_query_fields', :f => report_query %>
+        <% end %>
+        <div class="links">
+          <%= link_to_add_association 'link query data', form, :report_queries %>
+        </div>
+      </div>
+
+    </div>
+  <% end %>
+
+    <div class="buttons">
+      <%= link_to 'Cancel', @_request.fullpath.split('/').slice(0,@_request.fullpath.split('/').length-1).join('/'), :class => 'cancel-button' %>
+      <% if form.present? %>
+        <%= form.button :submit, :value => 'Save' %>
+      <% else %>
+
+      <% end %>
+      <div class="clear"></div>
+    </div>
+<% end %>

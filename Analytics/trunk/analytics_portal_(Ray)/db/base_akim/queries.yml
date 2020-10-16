@@ -1,0 +1,960 @@
+
+--- 
+queries: 
+  columns: 
+  - id
+  - data_segment_id
+  - query_string
+  - store_in_db
+  - created_at
+  - updated_at
+  - query_result_id
+  - sample_data
+  - name
+  records: 
+  - - 1
+    - 7
+    - |-
+      SELECT a.sum_158_1 AS connperdaywifi, a.sum_158_2 AS connperdaycdma, a.sum_158_3 AS connperdaywimax, a.sum_158_4 AS connperdayethernet, b.devicetype AS devicetype, a.c_date AS c_date, b.c_36 AS manufacturer, b.c_37 AS devicemodel FROM
+      (
+      SELECT SUM(c_158_1) AS sum_158_1, SUM(c_158_2) AS sum_158_2, SUM(c_158_3) AS sum_158_3, SUM(c_158_4) AS sum_158_4, to_date(server_date) AS c_date, uuid
+      FROM LogEvents
+      WHERE en = "ApplicationInfo"
+      GROUP BY to_date(server_date), uuid
+      ) a
+      JOIN
+      (
+      SELECT c_36, c_37, devicetype, to_date(server_date) AS c_date, uuid
+      FROM LogEvents
+      WHERE (en = "WiFiDeviceInsertion" OR en="3GDeviceInsertion" OR en="4GDeviceInsertion")
+      GROUP BY c_36, c_37, devicetype, to_date(server_date), uuid
+      ) b
+      ON (a.c_date = b.c_date
+          AND a.uuid = b.uuid)
+    - false
+    - 2011-05-27 00:51:12 Z
+    - 2011-06-27 22:56:03 Z
+    - 
+    - ""
+    - Usage Trend 1 - Connections / Day - Parent
+  - - 2
+    - 5
+    - |-
+      SELECT SUM(c_158_1) AS conn_per_day_wifi, SUM(c_158_2) AS conn_per_day_cdma, SUM(c_158_3) AS conn_per_day_wimax, SUM(c_158_4) AS conn_per_day_ethernet, devicetype, to_date(server_date) AS c_date, Hour(server_date) AS hour
+      from LogEvents
+      where en = "ApplicationInfo"
+      GROUP BY devicetype, to_date(server_date), Hour(server_date)
+    - false
+    - 2011-05-27 00:51:12 Z
+    - 2011-06-27 22:53:24 Z
+    - 1
+    - ""
+    - Daily Usage - Connections / Hour - Parent
+  - - 3
+    - 6
+    - |-
+      SELECT uuid, c_36 AS manufacturer, c_37 AS device_model, Year(server_date) AS year, Month(server_date) AS month
+      FROM LogEvents
+      WHERE (en = "WiFiDeviceInsertion" OR en="3GDeviceInsertion" OR en="4GDeviceInsertion")
+      GROUP BY uuid, c_36, c_37, Year(server_date), Month(server_date)
+    - false
+    - 2011-05-27 00:51:12 Z
+    - 2011-06-27 18:29:48 Z
+    - 
+    - ""
+    - Licensing Report 1 - New Licenses - Parent
+  - - 5
+    - 5
+    - |-
+      SELECT SUM(conn_per_day_wifi) AS conn_per_hour_wifi, SUM(conn_per_day_cdma) AS conn_per_hour_cdma, SUM(conn_per_day_wimax) AS conn_per_hour_wimax, SUM(conn_per_day_ethernet) AS conn_per_hour_ethernet, hour, c_date
+      from #HIVE_PARENT_TABLE
+      GROUP BY hour, c_date
+    - true
+    - 2011-05-27 00:51:12 Z
+    - 2011-06-27 22:53:24 Z
+    - 2
+    - ""
+    - Daily Usage - Connections / Hour - Child
+  - - 6
+    - 6
+    - |
+      SELECT COUNT(uuid) AS cnt_current_total, concat(year,"-",month) AS server_date, 1 AS sum_helper
+      FROM #HIVE_PARENT_TABLE
+      WHERE concat(year,"-",month) = '{1_month_ago}'
+      GROUP BY concat(year,"-",month)
+
+    - false
+    - 2011-05-27 00:51:12 Z
+    - 2011-06-27 18:29:48 Z
+    - 
+    - ""
+    - Licensing Report 1 - New Licenses - Child 1
+  - - 7
+    - 8
+    - |-
+      SELECT count(distinct uuid) as cnt_unique_uuid, c_36 AS manufacturer, c_37 AS devicemodel, to_date(server_date) AS c_date, 1 AS sum_helper
+      FROM LogEvents
+      WHERE (en = "DeviceInsertion" OR en = "WiFiDeviceInsertion" OR en="3GDeviceInsertion" OR en="4GDeviceInsertion")
+      GROUP BY c_36, c_37, to_date(server_date)
+    - false
+    - 2011-05-27 00:51:12 Z
+    - 2011-06-27 18:28:21 Z
+    - 
+    - ""
+    - Device Usage - Parent
+  - - 9
+    - 6
+    - |-
+      SELECT COUNT(cur_uuid.uuid) AS cnt_returning, 1 AS sum_helper
+      FROM
+      (
+      SELECT uuid
+      FROM #HIVE_PARENT_TABLE
+      WHERE concat(year,"-",month) = '{1_month_ago}'
+      GROUP BY uuid
+      ) cur_uuid
+      JOIN
+      (
+      SELECT uuid
+      FROM #HIVE_PARENT_TABLE
+      WHERE concat(year,"-",month) <= '{2_months_ago}'
+      GROUP BY uuid
+      ) pre_uuid
+      ON (cur_uuid.uuid = pre_uuid.uuid)
+    - false
+    - 2011-05-27 00:51:12 Z
+    - 2011-06-27 18:29:49 Z
+    - 
+    - ""
+    - Licensing Report 1 - New Licenses - Child 2
+  - - 10
+    - 1
+    - |-
+      SELECT SUM(c_158_1) AS conn_per_day_wifi, SUM(c_158_2) AS conn_per_day_cdma, SUM(c_158_3) AS conn_per_day_wimax, SUM(c_158_4) AS conn_per_day_ethernet, devicetype, to_date(server_date) AS c_date, DayOfWeek(server_date) AS day_of_week
+      FROM LogEvents
+      WHERE en = "ApplicationInfo"
+      GROUP BY devicetype, to_date(server_date), DayOfWeek(server_date)
+    - false
+    - 2011-05-27 00:51:12 Z
+    - 2011-06-27 23:05:24 Z
+    - 
+    - ""
+    - Weekly Usage Trend 1 - Connections / Day (Weekly) - Parent
+  - - 11
+    - 3
+    - |-
+      SELECT distinct c_160_1 AS error_code_wifi, c_160_2 AS error_code_cdma, c_160_3 AS error_code_wimax, c_160_4 AS error_code_ethernet, c_161_1 AS error_msg_wifi, c_161_2 AS error_msg_cdma, c_161_3 AS error_msg_wimax, c_161_4 AS error_msg_ethernet, devicetype, uuid, c_59 AS last_conn_timestamp_wifi, c_65 AS last_conn_timestamp_cdma, c_27 AS last_conn_timestamp_wimax, c_177 AS last_conn_timestamp_ethernet, c_58 AS first_conn_timestamp_wifi, c_64 AS first_conn_timestamp_cdma, c_26 AS first_conn_timestamp_wimax, c_176 AS first_conn_timestamp_ethernet, c_170_1 AS time_conn_wifi, c_170_2 AS time_conn_cdma, c_170_3 AS time_conn_wimax, c_170_4 AS time_conn_ethernet, to_date(server_date) AS c_date, 1 AS sum_helper
+      FROM LogEvents
+    - false
+    - 2011-05-27 00:51:12 Z
+    - 2011-06-27 18:28:52 Z
+    - 
+    - ""
+    - Error Report - Parent
+  - - 12
+    - 6
+    - |-
+      SELECT (a.cnt_current_total - b.cnt_returning) AS cnt_new, a.server_date AS server_date
+      FROM #CHILD_1 a
+      JOIN
+      #CHILD_2 b
+      ON (a.sum_helper = b.sum_helper)
+    - true
+    - 2011-05-27 00:51:12 Z
+    - 2011-06-27 18:29:49 Z
+    - 
+    - ""
+    - Licensing Report 1 - New Licenses - Child 3
+  - - 13
+    - 1
+    - |-
+      SELECT SUM(conn_per_day_wifi) AS conn_per_day_wifi, SUM(conn_per_day_cdma) AS conn_per_day_cdma, SUM(conn_per_day_wimax) AS conn_per_day_wimax, SUM(conn_per_day_ethernet) conn_per_day_ethernet, day_of_week
+      from #HIVE_PARENT_TABLE
+      GROUP BY day_of_week
+    - true
+    - 2011-05-27 00:51:12 Z
+    - 2011-06-27 23:05:24 Z
+    - 
+    - ""
+    - Weekly Usage Trend 1 - Connections / Day (Weekly) - Child
+  - - 14
+    - 2
+    - |-
+      SELECT distinct c_160_1 AS error_code_wifi, c_160_2 AS error_code_cdma, c_160_3 AS error_code_wimax, c_160_4 AS error_code_ethernet, c_161_1 AS error_msg_wifi, c_161_2 AS error_msg_cdma, c_161_3 AS error_msg_wimax, c_161_4 AS error_msg_ethernet, devicetype, uuid, c_59 AS last_conn_timestamp_wifi, c_65 AS last_conn_timestamp_cdma, c_27 AS last_conn_timestamp_wimax, c_177 AS last_conn_timestamp_ethernet, c_58 AS first_conn_timestamp_wifi, c_64 AS first_conn_timestamp_cdma, c_26 AS first_conn_timestamp_wimax, c_176 AS first_conn_timestamp_ethernet, c_170_1 AS time_conn_wifi, c_170_2 AS time_conn_cdma, c_170_3 AS time_conn_wimax, c_170_4 AS time_conn_ethernet, to_date(server_date) AS c_date, 1 AS sum_helper
+      FROM LogEvents
+    - false
+    - 2011-05-27 00:51:12 Z
+    - 2011-06-27 18:29:04 Z
+    - 
+    - "{\"columns\":[\"x\",\"sum_avg_141_142\",\"radius_data\"],\"count\":3,\"data\":[[50,50,4],[15,40,7],[20,30,5]]}"
+    - Error Scatterplot - Parent
+  - - 17
+    - 4
+    - SELECT AVG(c_141) AS avg_upload, AVG(c_142) AS avg_download, devicetype, year(server_date) AS year, Month(server_date) AS month FROM LogEvents WHERE en = "Disconnect" GROUP BY devicetype, year(server_date), Month(server_date)
+    - false
+    - 2011-05-27 00:51:12 Z
+    - 2011-06-27 21:05:49 Z
+    - 
+    - ""
+    - Data By Technology - Parent
+  - - 18
+    - 4
+    - "SELECT devicetype, (avg_upload+avg_download) AS sum_avg_upload_download, concat(year,\"-\",month) AS server_date FROM #HIVE_PARENT_TABLE"
+    - true
+    - 2011-05-27 00:51:12 Z
+    - 2011-06-27 21:05:49 Z
+    - 
+    - "{\"columns\":[\"date\",\"sum_avg_141_142\",\"159\"],\"count\":3,\"data\":[[\"2011-01\",106,1],[\"2011-02\",107,1],[\"2011-03\",231,1],[\"2011-04\",133,1],[\"2011-05\",221,1],[\"2011-06\",667,1],[\"2011-07\",890,1],[\"2011-08\",924,1],[\"2011-09\",1025,1],[\"2011-10\",1215,1],[\"2011-11\",1025,1],[\"2011-12\",357,1]]}"
+    - Data By Technology - Child
+  - - 21
+    - 9
+    - |-
+      SELECT AVG(c_141) AS avg_upload, AVG(c_142) AS avg_download, devicetype, to_date(server_date) AS c_date, DayOfWeek(server_date) AS day_of_week
+      FROM LogEvents
+      WHERE en = "Disconnect"
+      GROUP BY devicetype, to_date(server_date), DayOfWeek(server_date)
+    - false
+    - 2011-05-27 21:08:36 Z
+    - 2011-06-27 23:05:56 Z
+    - 
+    - ""
+    - Weekly Usage Trend 3 - Weekly Usage Trend Average Data Uploaded Downloaded - Parent
+  - - 22
+    - 9
+    - |-
+      SELECT (AVG(avg_upload) +  AVG(avg_download)) AS sum_avg_upload_download, day_of_week
+      from #HIVE_PARENT_TABLE
+      GROUP BY day_of_week
+    - true
+    - 2011-05-27 21:08:36 Z
+    - 2011-06-27 23:05:56 Z
+    - 
+    - ""
+    - Weekly Usage Trend 3 - Average Data Uploaded Downloaded - Child
+  - - 23
+    - 10
+    - |-
+      SELECT AVG(c_141) AS avg_upload, AVG(c_142) AS avg_download, devicetype, to_date(server_date) AS c_date, Hour(server_date) AS hour
+      FROM LogEvents
+      WHERE en = "Disconnect"
+      GROUP BY devicetype, to_date(server_date), Hour(server_date)
+    - false
+    - 2011-05-27 22:38:39 Z
+    - 2011-06-27 22:55:06 Z
+    - 
+    - ""
+    - Daily Usage 3 - Average Data Uploaded Downloaded - Parent
+  - - 24
+    - 10
+    - |-
+      SELECT (AVG(avg_upload) + AVG(avg_download)) AS sum_avg_upload_download, hour
+      FROM #HIVE_PARENT_TABLE
+      GROUP BY hour
+    - true
+    - 2011-05-27 22:38:39 Z
+    - 2011-06-27 22:55:06 Z
+    - 
+    - ""
+    - Daily Usage 3 - Average Data Uploaded Downloaded - Child
+  - - 25
+    - 8
+    - |-
+      SELECT (a.cnt_unique_uuid/b.total_unique_uuid) AS percent_uuid, a.c_date AS c_date, a.manufacturer AS manufacturer, a.devicemodel AS devicemodel
+      FROM ( SELECT cnt_unique_uuid, c_date, sum_helper, manufacturer, devicemodel
+      FROM #HIVE_PARENT_TABLE) a
+      JOIN ( SELECT SUM(cnt_unique_uuid) AS total_unique_uuid, sum_helper
+      FROM #HIVE_PARENT_TABLE
+      GROUP BY sum_helper) b
+      ON (a.sum_helper = b.sum_helper)
+    - true
+    - 2011-05-27 22:47:30 Z
+    - 2011-06-27 18:28:21 Z
+    - 
+    - ""
+    - Device Usage - Child
+  - - 26
+    - 11
+    - |-
+      SELECT devicetype, SUM(c_158_1) AS conn_per_day_wifi, SUM(c_158_2) AS conn_per_day_cdma, SUM(c_158_3) AS conn_per_day_wimax, SUM(c_158_4) AS conn_per_day_ethernet, SUM(c_21) AS failed_conn_per_day_wifi, SUM(c_22) AS failed_conn_per_day_wwan, SUM(c_25) AS failed_conn_per_day_wimax, SUM(c_150) AS dropped_per_day, SUM(c_170_1) AS sum_170_1, SUM(c_170_2) AS sum_170_2, SUM(c_170_3) AS sum_170_3, SUM(c_170_4) AS sum_170_4, AVG(c_170_1) AS avg_170_1, AVG(c_170_2) AS avg_170_2, AVG(c_170_3) AS avg_170_3, AVG(c_170_4) AS avg_170_4, SUM(c_142) AS sum_142, SUM(c_141) AS sum_141, AVG(c_171_1) AS avg_171_1, AVG(c_171_2) AS avg_171_2, AVG(c_171_3) AS avg_171_3, AVG(c_171_4) AS avg_171_4, AVG(c_172_1) AS avg_172_1, AVG(c_172_2) AS avg_172_2, AVG(c_172_3) AS avg_172_3, AVG(c_172_4) AS avg_172_4, AVG(c_162_1) AS avg_162_1, AVG(c_162_2) AS avg_162_2, AVG(c_162_3) AS avg_162_3, AVG(c_162_4) AS avg_162_4, to_date(server_date) AS c_date
+      from LogEvents
+      GROUP BY devicetype, to_date(server_date)
+    - false
+    - 2011-05-28 06:41:21 Z
+    - 2011-06-27 18:30:41 Z
+    - 
+    - ""
+    - Technology Performance Report - Parent
+  - - 27
+    - 11
+    - |-
+      SELECT devicetype AS connection_type, conn_per_day_wifi, conn_per_day_cdma, conn_per_day_wimax, conn_per_day_ethernet, failed_conn_per_day_wifi, failed_conn_per_day_wwan, failed_conn_per_day_wimax, dropped_per_day, AVG(sum_170_1) AS avg_time_conn_per_day_wifi, AVG(sum_170_2) AS avg_time_conn_per_day_cdma, AVG(sum_170_3) AS avg_time_conn_per_day_wimax, AVG(sum_170_4) AS avg_time_conn_per_day_ethernet, avg_170_1 AS avg_time_conn_per_session_wifi, avg_170_2 AS avg_time_conn_per_session_cdma, avg_170_3 AS avg_time_conn_per_session_wimax, avg_170_4 AS avg_time_conn_per_session_ethernet, AVG(sum_142) AS avg_downloaded_per_day, AVG(sum_141) AS avg_uploaded_per_day, avg_171_1 AS avg_download_speed_wifi, avg_171_2 AS avg_download_speed_cdma, avg_171_3 AS avg_download_speed_wimax, avg_171_4 AS avg_download_speed_ethernet, avg_172_1 AS avg_upload_speed_wifi, avg_172_2 AS avg_upload_speed_cdma, avg_172_3 AS avg_upload_speed_wimax, avg_172_4 AS avg_upload_speed_ethernet, avg_162_1 AS avg_signal_strength_wifi, avg_162_2 AS avg_signal_strength_cdma, avg_162_3 AS avg_signal_strength_wimax, avg_162_4 AS avg_signal_strength_ethernet, c_date AS c_date
+      FROM #HIVE_PARENT_TABLE
+      GROUP BY devicetype, conn_per_day_wifi, conn_per_day_cdma, conn_per_day_wimax, conn_per_day_ethernet, failed_conn_per_day_wifi, failed_conn_per_day_wwan, failed_conn_per_day_wimax, dropped_per_day, avg_170_1, avg_170_2, avg_170_3, avg_170_4, avg_171_1, avg_171_2, avg_171_3, avg_171_4, avg_172_1, avg_172_2, avg_172_3, avg_172_4, avg_162_1, avg_162_2, avg_162_3, avg_162_4, c_date
+    - true
+    - 2011-05-28 06:41:21 Z
+    - 2011-06-27 18:30:41 Z
+    - 
+    - ""
+    - Technology Performance Report - Child
+  - - 28
+    - 12
+    - |-
+      SELECT devicetype, SUM(c_158_1) AS sum_158_1, SUM(c_158_2) AS sum_158_2, SUM(c_158_3) AS sum_158_3, SUM(c_158_4) AS sum_158_4, SUM(c_141) AS sum_141, SUM(c_142) AS sum_142, AVG(c_171_1) AS avg_171_1, AVG(c_171_2) AS avg_171_2, AVG(c_171_3) AS avg_171_3, AVG(c_171_4) AS avg_171_4, AVG(c_162_1) AS avg_162_1, AVG(c_162_2) AS avg_162_2, AVG(c_162_3) AS avg_162_3, AVG(c_162_4) AS avg_162_4, to_date(server_date) AS c_date
+      FROM LogEvents
+      GROUP BY devicetype, to_date(server_date)
+    - false
+    - 2011-05-28 21:01:51 Z
+    - 2011-06-27 18:30:53 Z
+    - 
+    - ""
+    - Technology Performance Summary - Parent
+  - - 29
+    - 12
+    - |-
+      SELECT devicetype, sum_158_1 AS conn_attempts_wifi, sum_158_2 AS conn_attempts_cdma, sum_158_3 AS conn_attempts_wimax, sum_158_4 AS conn_attempts_ethernet, AVG(sum_141 + sum_142) AS throughput_per_day, avg_171_1 AS download_speed_wifi, avg_171_2 AS download_speed_cdma, avg_171_3 AS download_speed_wimax, avg_171_4 AS download_speed_ethernet, avg_162_1 AS signal_strength_percent_wifi, avg_162_2 AS signal_strength_percent_cdma, avg_162_3 AS signal_strength_percent_wimax, avg_162_4 AS signal_strength_percent_ethernet, c_date
+      FROM #HIVE_PARENT_TABLE
+      GROUP BY devicetype, sum_158_1, sum_158_2, sum_158_3, sum_158_4, avg_171_1, avg_171_2, avg_171_3, avg_171_4, avg_162_1, avg_162_2, avg_162_3, avg_162_4, c_date
+    - true
+    - 2011-05-28 21:01:51 Z
+    - 2011-06-27 18:30:54 Z
+    - 
+    - ""
+    - Technology Performance Summary - Child
+  - - 30
+    - 13
+    - |-
+      SELECT c_160_1 AS error_code_wifi, c_160_2 AS error_code_cdma, c_160_3 AS error_code_wimax, c_160_4 AS error_code_ethernet, devicetype, c_36 AS manufacturer, c_37 AS devicemodel, COUNT(distinct uuid) AS cnt_unique_uuid, SUM(c_170_1) AS time_conn_per_day_wifi, SUM(c_170_2) AS time_conn_per_day_cdma, SUM(c_170_3) AS time_conn_per_day_wimax, SUM(c_170_4) AS time_conn_per_day_ethernet, SUM(c_142) AS data_download_per_day, SUM(c_141) AS data_upload_per_day, AVG(c_171_1) AS avg_peek_download_speed_wifi, AVG(c_171_2) AS avg_peek_download_speed_cdma, AVG(c_171_3) AS avg_peek_download_speed_wimax, AVG(c_171_4) AS avg_peek_download_speed_ethernet, AVG(c_172_1) AS avg_peek_upload_speed_wifi, AVG(c_172_2) AS avg_peek_upload_speed_cdma, AVG(c_172_3) AS avg_peek_upload_speed_wimax, AVG(c_172_4) AS avg_peek_upload_speed_ethernet, to_date(server_date) AS c_date, 1 AS sum_helper
+      from LogEvents
+      GROUP BY c_160_1, c_160_2, c_160_3, c_160_4, devicetype, c_36, c_37, to_date(server_date)
+    - false
+    - 2011-05-29 01:01:14 Z
+    - 2011-06-27 18:28:32 Z
+    - 
+    - ""
+    - Device Usage Report - Parent
+  - - 31
+    - 13
+    - |-
+      SELECT a.manufacturer, a.devicemodel, a.devicetype, (a.cnt_unique_uuid * 100 / b.total_unique_uuid) AS share, a.cnt_unique_uuid AS deviceuser, a.avg_sum_170_1 AS avg_conn_time_wifi_per_day, a. avg_sum_170_2 AS avg_conn_time_cdma_per_day, a. avg_sum_170_3 AS avg_conn_time_wimax_per_day, a. avg_sum_170_4 AS avg_conn_time_ethernet_per_day, a.avg_data_upload_per_day AS avg_data_upload_per_day, a.avg_data_download_per_day AS avg_data_download_per_day, a.avg_peek_download_speed_wifi AS avg_peek_download_speed_wifi, a.avg_peek_download_speed_cdma AS avg_peek_download_speed_cdma, a.avg_peek_download_speed_wimax AS avg_peek_download_speed_wimax, a.avg_peek_download_speed_ethernet AS avg_peek_download_speed_ethernet, a.avg_peek_upload_speed_wifi AS avg_peek_upload_speed_wifi, a.avg_peek_upload_speed_cdma AS avg_peek_upload_speed_cdma, a.avg_peek_upload_speed_wimax AS avg_peek_upload_speed_wimax, a.avg_peek_upload_speed_ethernet AS avg_peek_upload_speed_ethernet, a.c_date
+      
+      FROM (SELECT manufacturer, devicemodel, devicetype, cnt_unique_uuid,  AVG(time_conn_per_day_wifi) AS avg_sum_170_1, AVG(time_conn_per_day_cdma) AS avg_sum_170_2, AVG(time_conn_per_day_wimax) AS
+      avg_sum_170_3, AVG(time_conn_per_day_ethernet) AS avg_sum_170_4, AVG(data_download_per_day) AS avg_data_download_per_day, AVG(data_upload_per_day) AS avg_data_upload_per_day, avg_peek_download_speed_wifi, avg_peek_download_speed_cdma, avg_peek_download_speed_wimax, avg_peek_download_speed_ethernet, avg_peek_upload_speed_wifi, avg_peek_upload_speed_cdma, avg_peek_upload_speed_wimax, avg_peek_upload_speed_ethernet, c_date, sum_helper
+      
+      FROM #HIVE_PARENT_TABLE
+      
+      GROUP BY manufacturer, devicemodel, devicetype, cnt_unique_uuid, avg_peek_download_speed_wifi, avg_peek_download_speed_cdma, avg_peek_download_speed_wimax, avg_peek_download_speed_ethernet, avg_peek_upload_speed_wifi, avg_peek_upload_speed_cdma, avg_peek_upload_speed_wimax, avg_peek_upload_speed_ethernet, c_date, sum_helper
+      ) a
+      JOIN (SELECT SUM(cnt_unique_uuid) AS total_unique_uuid, sum_helper
+      FROM #HIVE_PARENT_TABLE
+      GROUP BY sum_helper) b
+      ON (a.sum_helper = b.sum_helper)
+    - true
+    - 2011-05-29 01:01:14 Z
+    - 2011-06-27 18:28:33 Z
+    - 
+    - ""
+    - Device Usage Report - Child
+  - - 32
+    - 14
+    - |-
+      SELECT c_36 AS manufacturer, c_37 AS devicemodel, COUNT(distinct uuid) AS cnt_unique_uuid, SUM(c_170_1) AS time_conn_per_day_wifi, SUM(c_170_2) AS time_conn_per_day_cdma, SUM(c_170_3) AS time_conn_per_day_wimax, SUM(c_170_4) AS time_conn_per_day_ethernet, SUM(c_142) AS data_download_per_day, SUM(c_141) AS data_upload_per_day, to_Date(server_date) AS c_date, 1 AS sum_helper
+      from LogEvents
+      GROUP BY c_36, c_37, to_Date(server_date)
+    - false
+    - 2011-05-29 01:05:06 Z
+    - 2011-06-27 18:28:42 Z
+    - 
+    - ""
+    - Device Usage Summary - Parent
+  - - 33
+    - 14
+    - |-
+      SELECT a.manufacturer, a.devicemodel, (a.cnt_unique_uuid * 100 / b.total_unique_uuid) AS share, a.avg_time_conn_per_day_wifi, a.avg_time_conn_per_day_cdma, a.avg_time_conn_per_day_wimax, a.avg_time_conn_per_day_ethernet, (a.avg_data_download_per_day + a.avg_data_upload_per_day) AS throughput_per_day, a.c_date
+      FROM (SELECT manufacturer, devicemodel, cnt_unique_uuid,  AVG(time_conn_per_day_wifi) AS avg_time_conn_per_day_wifi, AVG(time_conn_per_day_cdma) AS avg_time_conn_per_day_cdma, AVG(time_conn_per_day_wimax) AS
+      avg_time_conn_per_day_wimax, AVG(time_conn_per_day_ethernet) AS avg_time_conn_per_day_ethernet, AVG(data_download_per_day) AS avg_data_download_per_day, AVG(data_upload_per_day) AS avg_data_upload_per_day, c_date, sum_helper
+      FROM #HIVE_PARENT_TABLE
+      
+      GROUP BY manufacturer, devicemodel, cnt_unique_uuid, c_date, sum_helper
+      ) a
+      JOIN (SELECT SUM(cnt_unique_uuid) AS total_unique_uuid, sum_helper
+      FROM #HIVE_PARENT_TABLE
+      GROUP BY sum_helper) b
+      ON (a.sum_helper = b.sum_helper)
+    - true
+    - 2011-05-29 01:05:06 Z
+    - 2011-06-27 18:28:43 Z
+    - 
+    - ""
+    - Device Usage Summary - Child
+  - - 34
+    - 7
+    - |-
+      SELECT connperdaywifi, connperdaycdma, connperdaywimax, connperdayethernet, devicetype, manufacturer, devicemodel, c_date
+      FROM #HIVE_PARENT_TABLE
+    - true
+    - 2011-05-29 03:22:47 Z
+    - 2011-06-27 22:56:03 Z
+    - 
+    - ""
+    - Usage Trend 1 - Connections Per Day - Child
+  - - 35
+    - 15
+    - |-
+      SELECT a.avg_141 AS avg_upload, a.avg_142 AS avg_download, a.devicetype AS devicetype, a.c_date AS c_date, b.c_36 AS manufacturer, b.c_37 AS devicemodel
+      FROM
+      (
+      SELECT AVG(c_141) AS avg_141, AVG(c_142) AS avg_142, devicetype, to_date(server_date) AS c_date, uuid
+      FROM LogEvents
+      WHERE en = "Disconnect"
+      GROUP BY devicetype, to_date(server_date), uuid
+      ) a
+      JOIN
+      (
+      SELECT c_36, c_37, devicetype, to_date(server_date) AS c_date, uuid
+      FROM LogEvents
+      WHERE (en = "WiFiDeviceInsertion" OR en="3GDeviceInsertion" OR en="4GDeviceInsertion")
+      GROUP BY c_36, c_37, devicetype, to_date(server_date), uuid
+      ) b
+      ON (a.devicetype = b.devicetype
+                      AND a.c_date = b.c_date
+                      AND a.uuid = b.uuid)
+    - false
+    - 2011-05-29 03:36:01 Z
+    - 2011-06-27 22:57:35 Z
+    - 
+    - ""
+    - Usage Trend 3 - Average Data Uploaded and Downloaded - Parent
+  - - 36
+    - 15
+    - |-
+      SELECT (avg_upload + avg_download) AS sum_avg_upload_download, devicetype, manufacturer, devicemodel, c_date
+      FROM #HIVE_PARENT_TABLE
+    - true
+    - 2011-05-29 03:36:01 Z
+    - 2011-06-27 22:57:35 Z
+    - 
+    - ""
+    - Usage Trend 3 - Average Data Uploaded and Downloaded - Child
+  - - 37
+    - 3
+    - |-
+      SELECT distinct error_code, error_msg, devicetype, uuid, last_conn_timestamp, first_conn_timestamp, time_conn, c_date, sum_helper FROM (
+      SELECT distinct error_code_wifi AS error_code, error_msg_wifi AS error_msg, devicetype, uuid, last_conn_timestamp_wifi AS last_conn_timestamp, first_conn_timestamp_wifi AS first_conn_timestamp, time_conn_wifi AS time_conn, c_date, 1 AS sum_helper
+      FROM #HIVE_PARENT_TABLE
+      UNION ALL
+      SELECT distinct error_code_cdma AS error_code, error_msg_cdma AS error_msg, devicetype, uuid, last_conn_timestamp_cdma AS last_conn_timestamp, first_conn_timestamp_cdma AS first_conn_timestamp, time_conn_cdma AS time_conn, c_date, 1 AS sum_helper
+      FROM #HIVE_PARENT_TABLE
+      UNION ALL
+      SELECT distinct error_code_wimax AS error_code, error_msg_wimax AS error_msg, devicetype, uuid, last_conn_timestamp_wimax AS last_conn_timestamp, first_conn_timestamp_wimax AS first_conn_timestamp, time_conn_wimax AS time_conn, c_date, 1 AS sum_helper
+      FROM #HIVE_PARENT_TABLE
+      UNION ALL
+      SELECT distinct error_code_ethernet AS error_code, error_msg_ethernet AS error_msg, devicetype, uuid, last_conn_timestamp_ethernet AS last_conn_timestamp, first_conn_timestamp_ethernet AS first_conn_timestamp, time_conn_ethernet AS time_conn, c_date, 1 AS sum_helper
+      FROM #HIVE_PARENT_TABLE
+      ) a
+    - false
+    - 2011-05-29 05:19:01 Z
+    - 2011-06-27 18:28:53 Z
+    - 
+    - ""
+    - Error Report - Child 1
+  - - 38
+    - 3
+    - |-
+      SELECT a.error_code AS error_code, a.error_msg AS error_msg, a.devicetype AS devicetype, (a.total_active_user_affected * 100 / b.total_active_user) AS percent_user_affected, a.frequency_per_hour AS frequency_per_hour, a.total_cnt_error AS total_cnt_error FROM
+      
+      (SELECT error_code, error_msg, devicetype, COUNT(DISTINCT uuid) AS total_active_user_affected, (COUNT(error_code)/CASE SUM(time_conn) WHEN 0.0 THEN 1.0 ELSE SUM(time_conn) END) AS frequency_per_hour, COUNT(error_code) AS total_cnt_error, sum_helper
+      FROM #PREVIOUS
+      WHERE error_code != ''
+      GROUP BY error_code, error_msg, devicetype, sum_helper) a
+      
+      JOIN
+      
+      (SELECT COUNT(DISTINCT uuid) AS total_active_user, sum_helper
+      FROM #PREVIOUS
+      GROUP BY sum_helper) b
+      
+      ON (a.sum_helper = b.sum_helper)
+    - true
+    - 2011-05-29 05:19:59 Z
+    - 2011-06-27 18:28:53 Z
+    - 
+    - ""
+    - Error Report - Child 2
+  - - 39
+    - 16
+    - |-
+      SELECT distinct c_160_1 AS error_code_wifi, c_160_2 AS error_code_cdma, c_160_3 AS error_code_wimax, c_160_4 AS error_code_ethernet, c_161_1 AS error_msg_wifi, c_161_2 AS error_msg_cdma, c_161_3 AS error_msg_wimax, c_161_4 AS error_msg_ethernet, uuid, c_59 AS last_conn_timestamp_wifi, c_65 AS last_conn_timestamp_cdma, c_27 AS last_conn_timestamp_wimax, c_177 AS last_conn_timestamp_ethernet, c_58 AS first_conn_timestamp_wifi, c_64 AS first_conn_timestamp_cdma, c_26 AS first_conn_timestamp_wimax, c_176 AS first_conn_timestamp_ethernet, c_170_1 AS time_conn_wifi, c_170_2 AS time_conn_cdma, c_170_3 AS time_conn_wimax, c_170_4 AS time_conn_ethernet, to_date(server_date) AS c_date, 1 AS sum_helper
+      FROM LogEvents
+    - false
+    - 2011-05-29 06:28:00 Z
+    - 2011-06-27 18:29:37 Z
+    - 
+    - ""
+    - Error Summary - Parent
+  - - 40
+    - 16
+    - |-
+      SELECT distinct error_code, error_msg, uuid, last_conn_timestamp, first_conn_timestamp, time_conn, c_date, sum_helper FROM (
+      SELECT distinct error_code_wifi AS error_code, error_msg_wifi AS error_msg, uuid, last_conn_timestamp_wifi AS last_conn_timestamp, first_conn_timestamp_wifi AS first_conn_timestamp, time_conn_wifi AS time_conn, c_date, 1 AS sum_helper
+      FROM #HIVE_PARENT_TABLE
+      UNION ALL
+      SELECT distinct error_code_cdma AS error_code, error_msg_cdma AS error_msg, uuid, last_conn_timestamp_cdma AS last_conn_timestamp, first_conn_timestamp_cdma AS first_conn_timestamp, time_conn_cdma AS time_conn, c_date, 1 AS sum_helper
+      FROM #HIVE_PARENT_TABLE
+      UNION ALL
+      SELECT distinct error_code_wimax AS error_code, error_msg_wimax AS error_msg, uuid, last_conn_timestamp_wimax AS last_conn_timestamp, first_conn_timestamp_wimax AS first_conn_timestamp, time_conn_wimax AS time_conn, c_date, 1 AS sum_helper
+      FROM #HIVE_PARENT_TABLE
+      UNION ALL
+      SELECT distinct error_code_ethernet AS error_code, error_msg_ethernet AS error_msg, uuid, last_conn_timestamp_ethernet AS last_conn_timestamp, first_conn_timestamp_ethernet AS first_conn_timestamp, time_conn_ethernet AS time_conn, c_date, 1 AS sum_helper
+      FROM #HIVE_PARENT_TABLE
+      ) a
+    - false
+    - 2011-05-29 06:28:58 Z
+    - 2011-06-27 18:29:37 Z
+    - 
+    - ""
+    - Error Summary - Child 1
+  - - 41
+    - 16
+    - |-
+      SELECT a.error_code AS error_code, a.error_msg AS error_msg, (a.total_active_user_affected * 100 / b.total_active_user) AS percent_user_affected, a.frequency_per_hour AS frequency_per_hour FROM
+      (SELECT error_code, error_msg, COUNT(DISTINCT uuid) AS total_active_user_affected, (COUNT(error_code)/CASE SUM(time_conn) WHEN 0.0 THEN 1.0 ELSE SUM(time_conn) END) AS frequency_per_hour, sum_helper
+      FROM #PREVIOUS
+      WHERE error_code != ''
+      GROUP BY error_code, error_msg, sum_helper) a
+      JOIN
+      (SELECT COUNT(DISTINCT uuid) AS total_active_user, sum_helper
+      FROM #PREVIOUS
+      GROUP BY sum_helper) b
+      ON (a.sum_helper = b.sum_helper)
+    - true
+    - 2011-05-29 06:29:43 Z
+    - 2011-06-27 18:29:38 Z
+    - 
+    - ""
+    - Error Summary - Child 2
+  - - 42
+    - 17
+    - |-
+      SELECT devicetype,
+      SUM(c_158_1) AS conn_attempts_wifi,
+      SUM(c_158_2) AS conn_attempts_cdma,
+      SUM(c_158_3) AS conn_attempts_wimax,
+      SUM(c_158_4) AS conn_attempts_ethernet,
+      Year(server_date) AS year,
+      Month(server_date) AS month,
+      heat_lat,
+      heat_lng,
+      heat_x,
+      heat_y,
+      heat_num
+      FROM LogEvents
+      GROUP BY devicetype, Year(server_date), Month(server_date) , heat_lat, heat_lng, heat_x, heat_y, heat_num
+    - false
+    - 2011-06-07 21:22:33 Z
+    - 2011-06-22 23:57:58 Z
+    - 3
+    - ""
+    - Total Connections Heat Map - Parent
+  - - 43
+    - 18
+    - |
+      SELECT uuid, c_36 AS manufacturer, c_37 AS device_model, Year(server_date) AS year, Month(server_date) AS month
+      FROM LogEvents
+      WHERE (en = "WiFiDeviceInsertion" OR en="3GDeviceInsertion" OR en="4GDeviceInsertion")
+      GROUP BY uuid, c_36, c_37, Year(server_date), Month(server_date)
+
+    - false
+    - 2011-06-13 23:06:16 Z
+    - 2011-06-27 18:29:15 Z
+    - 
+    - ""
+    - KPI - License Data - Parent
+  - - 44
+    - 18
+    - |-
+      SELECT COUNT(uuid) AS cnt_current_total, 1 AS sum_helper, concat(year,"-",month) AS server_date
+      FROM #HIVE_PARENT_TABLE
+      GROUP BY concat(year,"-",month)
+    - true
+    - 2011-06-13 23:06:16 Z
+    - 2011-06-27 18:29:16 Z
+    - 
+    - ""
+    - KPI - License Data - Current Licenses
+  - - 45
+    - 18
+    - |-
+      SELECT COUNT(cur_uuid.uuid) AS cnt_returning, 1 AS sum_helper, cur_uuid.server_date
+      FROM
+      (
+      SELECT uuid, concat(year,"-",month) AS server_date
+      FROM #HIVE_PARENT_TABLE
+      {where_1_month_ago}
+      GROUP BY uuid, concat(year,"-",month)
+      ) cur_uuid
+      JOIN
+      (
+      SELECT uuid 
+      FROM #HIVE_PARENT_TABLE
+      {where_before_1_month_ago}
+      GROUP BY uuid
+      ) pre_uuid
+      ON (cur_uuid.uuid = pre_uuid.uuid)
+      GROUP BY cur_uuid.server_date
+    - true
+    - 2011-06-13 23:39:04 Z
+    - 2011-06-28 00:05:56 Z
+    - 
+    - ""
+    - KPI - License Data - Returning Licenses
+  - - 46
+    - 18
+    - |-
+      SELECT SUM(a.cnt_current_total - b.cnt_returning) AS cnt_new, b.server_date
+      FROM #CHILD_1 a
+      JOIN
+      #CHILD_2 b
+      ON (a.sum_helper = b.sum_helper)
+      GROUP BY b.server_date
+    - true
+    - 2011-06-14 01:59:23 Z
+    - 2011-06-27 18:29:16 Z
+    - 
+    - ""
+    - KPI - License Data - New Licenses
+  - - 47
+    - 19
+    - |-
+      SELECT b.c_21 AS conn_failure_cnt_wifi, b.c_57 AS conn_success_cnt_wifi, b.c_22 AS conn_failure_cnt_wwan, b.c_151 AS conn_success_cnt_wwan, b.c_25 AS conn_failure_cnt_wimax, b.c_24 AS conn_success_cnt_wimax, b.c_175 AS conn_failure_cnt_ethernet, b.c_174 AS conn_success_cnt_ethernet, a.c_150 AS dropped, a.devicetype AS devicetype, a.c_date AS c_date, b.c_36 AS manufacturer, b.c_37 AS devicemodel FROM
+      (
+      SELECT c_150, devicetype, to_date(server_date) AS c_date, uuid
+      FROM LogEvents
+      WHERE en = "Disconnect"
+      GROUP BY c_150, devicetype, to_date(server_date), uuid
+      ) a
+      JOIN
+      (
+      SELECT c_21, c_57, c_24, c_25, c_22, c_151, c_174, c_175, c_36, c_37, devicetype, to_date(server_date) AS c_date, uuid
+      FROM LogEvents
+      WHERE (en = "WiFiDeviceInsertion" OR en="3GDeviceInsertion" OR en="4GDeviceInsertion")
+      GROUP BY c_21, c_57, c_24, c_25, c_22, c_151, c_174, c_175, c_36, c_37, devicetype, to_date(server_date), uuid
+      ) b
+      ON (a.devicetype = b.devicetype
+                      AND a.c_date = b.c_date
+                      AND a.uuid = b.uuid)
+    - false
+    - 2011-06-20 21:11:05 Z
+    - 2011-06-27 18:38:01 Z
+    - 
+    - ""
+    - Usage Trend - Failure Rate - Parent
+  - - 48
+    - 19
+    - |
+      SELECT (conn_failure_cnt_wifi + dropped) / (conn_failure_cnt_wifi + dropped + conn_success_cnt_wifi) * 100 AS failure_rate_wifi, (conn_failure_cnt_wwan + dropped) / (conn_failure_cnt_wwan + dropped + conn_success_cnt_wwan) * 100 AS failure_rate_wwan, (conn_failure_cnt_wimax + dropped) / (conn_failure_cnt_wimax + dropped + conn_success_cnt_wimax) * 100 AS failure_rate_wimax, (conn_failure_cnt_ethernet + dropped) / (conn_failure_cnt_ethernet + dropped + conn_success_cnt_ethernet) * 100 AS failure_rate_ethernet, c_date
+      from #HIVE_PARENT_TABLE
+
+    - true
+    - 2011-06-20 21:11:05 Z
+    - 2011-06-27 18:38:02 Z
+    - 
+    - ""
+    - Usage Trend - Failure Rate - Child
+  - - 49
+    - 20
+    - |-
+      SELECT b.c_21 AS conn_failure_cnt_wifi, b.c_57 AS conn_success_cnt_wifi, b.c_22 AS conn_failure_cnt_wwan, b.c_151 AS conn_success_cnt_wwan, b.c_25 AS conn_failure_cnt_wimax, b.c_24 AS conn_success_cnt_wimax, b.c_175 AS conn_failure_cnt_ethernet, b.c_174 AS conn_success_cnt_ethernet, a.c_150 AS dropped, a.devicetype AS devicetype, a.day_of_week AS day_of_week, b.c_36 AS manufacturer, b.c_37 AS devicemodel FROM
+      (
+      SELECT c_150, devicetype, DayOfWeek(server_date) AS day_of_week, uuid
+      FROM LogEvents
+      WHERE en = "Disconnect"
+      GROUP BY c_150, devicetype, DayOfWeek(server_date), uuid
+      ) a
+      JOIN
+      (
+      SELECT c_21, c_57, c_24, c_25, c_22, c_151, c_174, c_175, c_36, c_37, devicetype, DayOfWeek(server_date) AS day_of_week, uuid
+      FROM LogEvents
+      WHERE (en = "WiFiDeviceInsertion" OR en="3GDevieInsertion" OR en="4GDevieInsertion")
+      GROUP BY c_21, c_57, c_24, c_25, c_22, c_151, c_174, c_175, c_36, c_37, devicetype, DayOfWeek(server_date), uuid
+      ) b
+      ON (a.devicetype = b.devicetype
+                      AND a.day_of_week = b.day_of_week
+                      AND a.uuid = b.uuid)
+    - false
+    - 2011-06-20 21:14:33 Z
+    - 2011-06-27 23:05:38 Z
+    - 
+    - ""
+    - Weekly Usage Trend 2 - Failure Rate - Parent
+  - - 50
+    - 20
+    - |
+      SELECT (conn_failure_cnt_wifi + dropped) / (conn_failure_cnt_wifi + dropped + conn_success_cnt_wifi) * 100 AS failure_rate_wifi, (conn_failure_cnt_wwan + dropped) / (conn_failure_cnt_wwan + dropped + conn_success_cnt_wwan) * 100 AS failure_rate_wwan, (conn_failure_cnt_wimax + dropped) / (conn_failure_cnt_wimax + dropped + conn_success_cnt_wimax) * 100 AS failure_rate_wimax, (conn_failure_cnt_ethernet + dropped) / (conn_failure_cnt_ethernet + dropped + conn_success_cnt_ethernet) * 100 AS failure_rate_ethernet, day_of_week
+      from #HIVE_PARENT_TABLE
+
+    - true
+    - 2011-06-20 21:14:33 Z
+    - 2011-06-27 23:05:38 Z
+    - 
+    - ""
+    - Weekly Usage Trend 2 - Failure Rate - Child
+  - - 51
+    - 21
+    - |-
+      SELECT b.c_21 AS conn_failure_cnt_wifi, b.c_57 AS conn_success_cnt_wifi, b.c_22 AS conn_failure_cnt_wwan, b.c_151 AS conn_success_cnt_wwan, b.c_25 AS conn_failure_cnt_wimax, b.c_24 AS conn_success_cnt_wimax, b.c_175 AS conn_failure_cnt_ethernet, b.c_174 AS conn_success_cnt_ethernet, a.c_150 AS dropped, a.devicetype AS devicetype, a.c_date AS c_date, a.hour AS hour, b.c_36 AS manufacturer, b.c_37 AS devicemodel FROM
+      (
+      SELECT c_150, devicetype, to_date(server_date) AS c_date, Hour(server_date) AS hour, uuid
+      FROM LogEvents
+      WHERE en = "Disconnect"
+      GROUP BY c_150, devicetype, to_date(server_date), Hour(server_date), uuid
+      ) a
+      JOIN
+      (
+      SELECT c_21, c_57, c_24, c_25, c_22, c_151, c_174, c_175, c_36, c_37, devicetype, to_date(server_date) AS c_date, Hour(server_date) AS hour, uuid
+      FROM LogEvents
+      WHERE (en = "WiFiDeviceInsertion" OR en="3GDeviceInsertion" OR en="4GDeviceInsertion")
+      GROUP BY c_21, c_57, c_24, c_25, c_22, c_151, c_174, c_175, c_36, c_37, devicetype, to_date(server_date), Hour(server_date), uuid
+      ) b
+      ON (a.devicetype = b.devicetype
+                      AND a.c_date = b.c_date
+                      AND a.uuid = b.uuid)
+    - false
+    - 2011-06-20 23:23:12 Z
+    - 2011-06-23 00:17:02 Z
+    - 5
+    - ""
+    - Daily Usage - Failure Rate - Parent
+  - - 52
+    - 21
+    - |
+      SELECT (conn_failure_cnt_wifi + dropped) / (conn_failure_cnt_wifi + dropped + conn_success_cnt_wifi) * 100 AS failure_rate_wifi, (conn_failure_cnt_wwan + dropped) / (conn_failure_cnt_wwan + dropped + conn_success_cnt_wwan) * 100 AS failure_rate_wwan, (conn_failure_cnt_wimax + dropped) / (conn_failure_cnt_wimax + dropped + conn_success_cnt_wimax) * 100 AS failure_rate_wimax, (conn_failure_cnt_ethernet + dropped) / (conn_failure_cnt_ethernet + dropped + conn_success_cnt_ethernet) * 100 AS failure_rate_ethernet, c_date, hour
+      from #HIVE_PARENT_TABLE
+
+    - true
+    - 2011-06-20 23:23:12 Z
+    - 2011-06-23 00:17:03 Z
+    - 6
+    - ""
+    - Daily Usage - Failure Rate - Child
+  - - 53
+    - 2
+    - |-
+      SELECT distinct error_code, error_msg, devicetype, uuid, last_conn_timestamp, first_conn_timestamp, time_conn, c_date, sum_helper FROM (
+      SELECT distinct error_code_wifi AS error_code, error_msg_wifi AS error_msg, devicetype, uuid, last_conn_timestamp_wifi AS last_conn_timestamp, first_conn_timestamp_wifi AS first_conn_timestamp, time_conn_wifi AS time_conn, c_date, 1 AS sum_helper
+      FROM #HIVE_PARENT_TABLE
+      UNION ALL
+      SELECT distinct error_code_cdma AS error_code, error_msg_cdma AS error_msg, devicetype, uuid, last_conn_timestamp_cdma AS last_conn_timestamp, first_conn_timestamp_cdma AS first_conn_timestamp, time_conn_cdma AS time_conn, c_date, 1 AS sum_helper
+      FROM #HIVE_PARENT_TABLE
+      UNION ALL
+      SELECT distinct error_code_wimax AS error_code, error_msg_wimax AS error_msg, devicetype, uuid, last_conn_timestamp_wimax AS last_conn_timestamp, first_conn_timestamp_wimax AS first_conn_timestamp, time_conn_wimax AS time_conn, c_date, 1 AS sum_helper
+      FROM #HIVE_PARENT_TABLE
+      UNION ALL
+      SELECT distinct error_code_ethernet AS error_code, error_msg_ethernet AS error_msg, devicetype, uuid, last_conn_timestamp_ethernet AS last_conn_timestamp, first_conn_timestamp_ethernet AS first_conn_timestamp, time_conn_ethernet AS time_conn, c_date, 1 AS sum_helper
+      FROM #HIVE_PARENT_TABLE
+      ) a
+    - false
+    - 2011-06-21 23:26:47 Z
+    - 2011-06-27 18:29:05 Z
+    - 
+    - ""
+    - Error Scatterplot - Child 1
+  - - 54
+    - 2
+    - |-
+      SELECT a.error_code AS error_code, a.error_msg AS error_msg, a.devicetype, (a.total_active_user_affected * 100 / b.total_active_user) AS percent_user_affected, a.frequency_per_hour AS frequency_per_hour FROM
+      (SELECT error_code, error_msg, devicetype, COUNT(DISTINCT uuid) AS total_active_user_affected, (COUNT(error_code)/CASE SUM(time_conn) WHEN 0.0 THEN 1.0 ELSE SUM(time_conn) END) AS frequency_per_hour, sum_helper
+      FROM #CHILD_1
+      WHERE error_code != ''
+      GROUP BY error_code, error_msg, devicetype, sum_helper) a
+      JOIN
+      (SELECT COUNT(DISTINCT uuid) AS total_active_user, sum_helper
+      FROM #CHILD_1
+      GROUP BY sum_helper) b
+      ON (a.sum_helper = b.sum_helper)
+    - true
+    - 2011-06-22 00:40:10 Z
+    - 2011-06-27 18:29:05 Z
+    - 
+    - ""
+    - Error Scatterplot - Child 2
+  - - 55
+    - 22
+    - |-
+      SELECT uuid, c_36 AS manufacturer, c_37 AS device_model, year(server_date) AS year, Month(server_date) AS month
+      FROM LogEvents
+      WHERE (en = "WiFiDeviceInsertion" OR en="3GDeviceInsertion" OR en="4GDeviceInsertion")
+      GROUP BY uuid, c_36, c_37, year(server_date), Month(server_date)
+    - false
+    - 2011-06-22 08:09:28 Z
+    - 2011-06-27 18:30:02 Z
+    - 
+    - ""
+    - Licensing Report 2 - Returning Licenses - Parent
+  - - 56
+    - 22
+    - |
+      SELECT COUNT(cur_uuid.uuid) AS cnt_returning, 1 AS sum_helper
+      FROM
+      (
+      SELECT uuid
+      FROM #HIVE_PARENT_TABLE
+      {where_1_month_ago}
+      GROUP BY uuid
+      ) cur_uuid
+      JOIN
+      (
+      SELECT uuid
+      FROM #HIVE_PARENT_TABLE
+      {where_before_1_month_ago}
+      GROUP BY uuid
+      ) pre_uuid
+      ON (cur_uuid.uuid = pre_uuid.uuid)
+
+    - true
+    - 2011-06-22 08:09:28 Z
+    - 2011-06-27 18:30:02 Z
+    - 
+    - ""
+    - Licensing Report 2 - Returning Licenses - Child
+  - - 57
+    - 23
+    - |-
+      SELECT uuid, c_36 AS manufacturer, c_37 AS device_model, year(server_date) AS year, Month(server_date) AS month
+      FROM LogEvents
+      WHERE (en = "WiFiDeviceInsertion" OR en="3GDeviceInsertion" OR en="4GDeviceInsertion")
+      GROUP BY uuid, c_36, c_37, year(server_date), Month(server_date)
+    - false
+    - 2011-06-22 08:17:13 Z
+    - 2011-06-27 18:30:29 Z
+    - 
+    - ""
+    - Licensing Report 3 - Lost Licenses - Parent
+  - - 58
+    - 23
+    - |-
+      SELECT COUNT(uuid) AS cnt_previous_total, 1 AS sum_helper
+      FROM #HIVE_PARENT_TABLE
+      {where_1_month_ago}
+      {and_manufacturer}
+      {and_device_model}
+    - false
+    - 2011-06-22 08:17:13 Z
+    - 2011-06-27 18:30:29 Z
+    - 
+    - ""
+    - Licensing Report 3 - Lost Licenses - Child 1
+  - - 59
+    - 23
+    - |-
+      SELECT COUNT(cur_uuid.uuid) AS cnt_returning, 1 AS sum_helper
+      FROM
+      (
+      SELECT uuid
+      FROM #HIVE_PARENT_TABLE
+      {where_1_month_ago}
+      {and_manufacturer}
+      {and_device_model}
+      GROUP BY uuid
+      ) cur_uuid
+      JOIN
+      (
+      SELECT uuid
+      FROM #HIVE_PARENT_TABLE
+      {where_before_1_month_ago}
+      {and_manufacturer}
+      {and_device_model}
+      GROUP BY uuid
+      ) pre_uuid
+      ON (cur_uuid.uuid = pre_uuid.uuid)
+    - false
+    - 2011-06-22 08:18:16 Z
+    - 2011-06-27 18:30:29 Z
+    - 
+    - ""
+    - Licensing Report 3 - Lost Licenses - Child 2
+  - - 60
+    - 23
+    - |-
+      SELECT COUNT(uuid) AS cnt_previous_total, 1 AS sum_helper
+      FROM #HIVE_PARENT_TABLE
+      {where_2_months_ago}
+      {and_manufacturer}
+      {and_device_model}
+    - true
+    - 2011-06-22 08:19:00 Z
+    - 2011-06-27 18:30:29 Z
+    - 
+    - ""
+    - Licensing Report 3 - Lost Licenses - Child 3
+  - - 61
+    - 17
+    - |-
+      SELECT distinct
+      devicetype,
+      sum_conn_attempts,
+      year,
+      month,
+      heat_lat,
+      heat_lng,
+      heat_x,
+      heat_y,
+      heat_num
+      FROM (
+              SELECT 'WiFiDevice' AS devicetype,
+              SUM(conn_attempts_wifi) AS sum_conn_attempts,
+              year,
+              month,
+              heat_lat,
+              heat_lng,
+              heat_x,
+              heat_y,
+              heat_num
+              FROM #HIVE_PARENT_TABLE
+              WHERE conn_attempts_wifi >= '0'
+              GROUP BY devicetype, year, month, heat_lat, heat_lng, heat_x, heat_y, heat_num
+      UNION ALL
+              SELECT '3GDevice' AS devicetype,
+              SUM(conn_attempts_cdma) AS sum_conn_attempts,
+              year,
+              month,
+              heat_lat,
+              heat_lng,
+              heat_x,
+              heat_y,
+              heat_num
+              FROM #HIVE_PARENT_TABLE
+              WHERE conn_attempts_cdma >= '0'
+              GROUP BY devicetype, year, month, heat_lat, heat_lng, heat_x, heat_y, heat_num
+      UNION ALL
+              SELECT '4GDevice' AS devicetype,
+              SUM(conn_attempts_wimax) AS sum_conn_attempts,
+              year,
+              month,
+              heat_lat,
+              heat_lng,
+              heat_x,
+              heat_y,
+              heat_num
+              FROM #HIVE_PARENT_TABLE
+              WHERE conn_attempts_wimax >= '0'
+              GROUP BY devicetype, year, month, heat_lat, heat_lng, heat_x, heat_y, heat_num
+      UNION ALL
+              SELECT 'EthernetDevice' AS devicetype,
+              SUM(conn_attempts_ethernet) AS sum_conn_attempts,
+              year,
+              month,
+              heat_lat,
+              heat_lng,
+              heat_x,
+              heat_y,
+              heat_num
+              FROM #HIVE_PARENT_TABLE
+              WHERE conn_attempts_ethernet >= '0'
+              GROUP BY devicetype, year, month, heat_lat, heat_lng, heat_x, heat_y, heat_num
+      ) a
+    - true
+    - 2011-06-22 20:16:47 Z
+    - 2011-06-27 18:35:57 Z
+    - 
+    - ""
+    - Total Connections Heat Map - Child

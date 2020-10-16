@@ -1,0 +1,31 @@
+<div class="nested-fields">
+  <h4>General</h4>
+
+  <div class="input select">
+    <%= f.label 'filter_param_type', 'Filter Type' %>
+    <%= f.collection_select :filter_param_type, f.object.options_for_filter_param_type, :first, :last %>
+  </div>
+  <%= f.input :column %>
+  <%= f.input :values, :input_html => { :rows => 5 } %>
+
+  <h4>Date</h4>
+  <div class="input select">
+    <%= f.label 'default_period', 'Default Period' %>
+    <%= f.collection_select :default_period, f.object.options_for_default_period, :first, :last %>
+  </div>
+  <div class="input select">
+    <%= f.label 'min_period', 'Minimum Period' %>
+    <%= f.collection_select :min_period, f.object.options_for_min_period, :first, :last %>
+  </div>
+
+  <h4>KPI</h4>
+  <%= f.input :default_name %>
+  <%= f.input :date_column %>
+  <div class="input select">
+    <%= f.association :report_query, :as => :select, :collection => @report.report_queries %>
+    <%= f.label 'interval', 'Interval' %>
+    <%= f.collection_select :interval, f.object.options_for_interval, :first, :last %>
+  </div>
+
+  <%= link_to_remove_association "remove filter param", f %>
+</div>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?><component name="dataSourceStorage">
+  <data-source source="LOCAL" name="Rails analytics_portal: test" product="" version="" jdbc-version="" driver-version="" uuid="1cc6348e-a894-4783-9c7a-9cd9502841f4">
+    <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
+    <jdbc-url>jdbc:mysql://127.0.0.1/analytics_portal_test</jdbc-url>
+    <user-name>analytics_portal</user-name>
+    <user-password>dfcddfd3dfcedf92df98dfc0dfce</user-password>
+    <libraries>
+      <library>
+        <url>file://$USER_HOME$/.RubyMine32/config/jdbc-drivers/mysql-connector-license.txt</url>
+      </library>
+      <library>
+        <url>jar://$USER_HOME$/.RubyMine32/config/jdbc-drivers/mysql-connector-java-5.1.16-bin.jar!/</url>
+      </library>
+    </libraries>
+  </data-source>
+  <data-source source="LOCAL" name="Rails analytics_portal: development" product="" version="" jdbc-version="" driver-version="" uuid="1c30fcea-7ffa-40e4-8ae5-d856b8fb20e8">
+    <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
+    <jdbc-url>jdbc:mysql://127.0.0.1/analytics_portal_dev</jdbc-url>
+    <user-name>analytics_portal</user-name>
+    <user-password>dfcddfd3dfcedf92df98dfc0dfce</user-password>
+    <libraries>
+      <library>
+        <url>file://$USER_HOME$/.RubyMine32/config/jdbc-drivers/mysql-connector-license.txt</url>
+      </library>
+      <library>
+        <url>jar://$USER_HOME$/.RubyMine32/config/jdbc-drivers/mysql-connector-java-5.1.16-bin.jar!/</url>
+      </library>
+    </libraries>
+  </data-source>
+  <data-source source="LOCAL" name="Rails analytics_portal: production" product="" version="" jdbc-version="" driver-version="" uuid="a0592d2b-e3aa-4564-8801-7d32f12b7ad1">
+    <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
+    <jdbc-url>jdbc:mysql://127.0.0.1/analytics_portal</jdbc-url>
+    <user-name>analytics_portal</user-name>
+    <user-password>dfcddfd3dfcedf92df98dfc0dfce</user-password>
+    <libraries>
+      <library>
+        <url>file://$USER_HOME$/.RubyMine32/config/jdbc-drivers/mysql-connector-license.txt</url>
+      </library>
+      <library>
+        <url>jar://$USER_HOME$/.RubyMine32/config/jdbc-drivers/mysql-connector-java-5.1.16-bin.jar!/</url>
+      </library>
+    </libraries>
+  </data-source>
+</component>

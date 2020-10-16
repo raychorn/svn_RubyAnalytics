@@ -1,0 +1,37 @@
+
+--- 
+dashboards: 
+  columns: 
+  - id
+  - name
+  - owner_id
+  - created_at
+  - updated_at
+  - filter_prefs
+  - shared
+  - position
+  records: 
+  - - 5
+    - My Dashboard
+    - 2
+    - 2011-05-29 07:46:31 Z
+    - 2011-06-27 17:49:31 Z
+    - 
+    - false
+    - 1
+  - - 6
+    - KPI
+    - 1
+    - 2011-05-31 14:29:34 Z
+    - 2011-06-14 11:09:22 Z
+    - 
+    - false
+    - 3
+  - - 8
+    - weekly usage
+    - 1
+    - 2011-06-08 22:32:44 Z
+    - 2011-06-09 00:15:12 Z
+    - 
+    - false
+    - 1

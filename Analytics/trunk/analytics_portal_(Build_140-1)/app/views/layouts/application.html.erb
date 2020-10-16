@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Analytics</title>
+  <%= render 'layouts/default_css' %>
+  <%= render 'layouts/default_js' %>
+  <%= csrf_meta_tag %>
+  <META HTTP-EQUIV="Refresh" CONTENT="1200;URL=/d/users/sign_out">
+  <%= render :partial => 'reports/reports_js', :locals => {:dashboard => @dashboard} %>
+</head>
+<!-- TODO: remove 'bp' class when developing graphics -->
+<body class="one-col bp <%= current_user ? 'logged-in' : '' %>">
+<div class="container">
+
+  <%= render 'shared/header' %>
+  <div id="content">
+      
+    <%= yield %>
+    
+  </div>
+  <%= render 'shared/footer' %>
+
+</div>
+</body>
+</html>

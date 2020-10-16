@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<project name="analytics-portal" default="no.op" basedir=".">
+
+  <target name="no.op"/>
+
+  <target name="clean">
+    <delete dir="${basedir}/public/stylesheets/compiled"/>
+  </target>
+
+  <target name="compass-compile">
+    <exec dir="${basedir}" executable="compass">
+      <arg line="compile --sass-dir app/stylesheets --css-dir public/stylesheets/compiled"/>
+    </exec>
+  </target>
+
+  <target name="build" depends="compass-compile">
+    <tar destfile="${basedir}/../analytics-portal-trunk.tar.gz" compression="gzip">
+      <tarfileset dir="${basedir}">
+        <exclude name="build.xml"/>
+        <exclude name=".sass-cache/**"/>
+        <exclude name="app/stylesheets/**"/>
+      </tarfileset>
+    </tar>
+  </target>
+
+</project>

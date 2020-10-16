@@ -1,0 +1,9 @@
+.*
+!.gitignore
+!.gitmodules
+*.gem
+.bundle
+Gemfile.lock
+pkg/*
+tags
+doc

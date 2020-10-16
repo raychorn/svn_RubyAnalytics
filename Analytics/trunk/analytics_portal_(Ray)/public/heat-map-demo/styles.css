@@ -1,0 +1,22 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+
+.DataGrids {
+	fontFamily: Verdana;
+	fontSize: 9;
+}
+	
+.HSlider {
+	dataTipOffset: -22;
+	dataTipStyleName: "myDataTip";
+}
+
+.myDataTip {
+	backgroundColor: black;
+	color: white;
+	fontWeight: bold;
+	fontFamily: Verdana;
+	fontSize: 16;
+}		

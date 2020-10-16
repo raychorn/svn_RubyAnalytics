@@ -1,0 +1,45 @@
+<div class="dialog">
+
+  <h1>Edit Job</h1>
+
+  <%= render 'form' %>
+
+  <div class="clear"></div>
+
+</div>
+
+<script type="text/javascript" language="JavaScript">
+    var __editor__ = $('#div_crontab_editor');
+    var __input__ = $('#data_segment_schedule');
+    var __checkbox__ = $('#data_segment_enable_schedule');
+    function show_crontab_editor() {
+        __editor__.html('');
+        __editor__.cron({
+            initial: __input__.val(),
+            onChange: function() {
+                __input__.val($(this).cron("value"));
+            }
+        });
+    }
+    function handle_display_crontab_editor() {
+        try {
+            if (__checkbox__.attr('checked')) {
+                show_crontab_editor();
+            }
+            __checkbox__.click(
+                    function (){
+                        if (__checkbox__.attr('checked')) {
+                            __editor__.show();
+                        } else {
+                            __editor__.hide();
+                        }
+                    }
+            );
+            __input__.val("42 3 * * 5");
+            show_crontab_editor();
+            __input__.attr('readonly', true);
+            __editor__.hide();
+        } catch (e) {alert(e.toString());}
+    }
+    handle_display_crontab_editor();
+</script>

@@ -1,0 +1,19 @@
+
+--- 
+configurations: 
+  columns: 
+  - id
+  - name
+  - locale
+  - time_zone
+  - created_at
+  - updated_at
+  - default_dashboard_id
+  records: 
+  - - 1
+    - Joe's Telecom
+    - en
+    - ""
+    - 2011-05-27 00:51:59 Z
+    - 2011-06-27 18:03:35 Z
+    - 5

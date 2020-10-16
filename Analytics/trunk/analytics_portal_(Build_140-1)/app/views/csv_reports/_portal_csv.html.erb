@@ -1,0 +1,33 @@
+<div id="flashContent">
+    <p>
+        To view this page ensure that Adobe Flash Player version
+        10.3.0 or greater is installed.
+    </p>
+    <script type="text/javascript">
+        var pageHost = ((document.location.protocol == "https:") ? "https://" : "http://");
+        document.write("<a href='http://www.adobe.com/go/getflashplayer'><img src='"
+                        + pageHost + "www.adobe.com/images/shared/download_buttons/get_flash_player.gif' alt='Get Adobe Flash player' /></a>" );
+    </script>
+</div>
+
+<script type="text/javascript">
+    var _has_flash_ = DetectFlashVer(10,3,0);
+    if (_has_flash_) {
+        var c = $('#flashContent');
+        if (c) {
+            var s = generate_flash_content(10,3,0,'/portal_csv/PortalCSVWeb1.swf?x='+uuid(),c.width(),$(window).height()-300,'portal_csv','portal_csv','#ffffff','','','',{});
+            c.html(s);
+        } else {
+            alert('WARNING: Cannot display the selected Report.  Please contact Customer Support.');
+        }
+    } else {
+        window.open('http://www.adobe.com/go/getflashplayer','_blank');
+    }
+</script>
+
+<noscript>
+  <p>
+      Either scripts and active content are not permitted to run or Adobe Flash Player version
+      10.3.0 or greater is not installed.
+  </p>
+</noscript>

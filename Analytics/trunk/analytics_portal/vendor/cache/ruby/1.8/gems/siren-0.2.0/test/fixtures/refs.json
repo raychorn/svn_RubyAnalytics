@@ -1,0 +1,26 @@
+[
+    {
+        "id":   "mike",
+        "favourite":  {"$ref": "mike"}
+    },
+    
+    {
+        "type": "person",
+        "id":   "bob",
+        "favourite":  {"$ref": "bob"}
+    },
+    
+    {
+        "type": "person",
+        "id":   "romeo",
+        "handle":     {"$ref": "@.id"},
+        "favourite":  {"$ref": "juliet"}
+    },
+    
+    {
+        "type": "person",
+        "id":   "juliet",
+        "favourite":  {"$ref": "romeo"}
+    }
+]
+

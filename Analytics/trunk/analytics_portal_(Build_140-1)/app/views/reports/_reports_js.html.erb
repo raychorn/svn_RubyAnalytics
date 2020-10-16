@@ -1,0 +1,46 @@
+<%- dashboard ||= nil %>
+
+<% if @displayed_reports.present? %>
+    <% @displayed_reports.each do |report| %>
+        <% if report.instance_of? HeatMapReport %>
+            <style type="text/css">
+                #map_canvas { height: 100% }
+            </style>
+            <script language="Javascript" type="text/javascript">
+                function initialize_google_maps() {
+                    loadScripts();
+                    initialize_heat_maps();
+                }
+                $(window).load(function () {
+                    var script1 = document.createElement("script");
+                    script1.type = "text/javascript";
+                    script1.src = "http://maps.google.com/maps/api/js?v=3.4&libraries=geometry&sensor=false&callback=initialize_google_maps";
+                    document.body.appendChild(script1);
+                });
+            </script>
+        <% end %>
+    <% end %>
+<% end %>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        <% if @displayed_reports.present? %>
+            <% @displayed_reports.each do |report| %>
+
+            <% if report.instance_of? ChartReport %>
+                <%- # funny syntax below as a single statement is due to a rubymine bug %>
+                smap.initChartReport(<%= "#{dashboard.nil? ? 'null' : dashboard.id},
+                    #{report.id}, #{report.highcharts_params_to_render.to_json},
+                    #{report.tooltip_formatter}".html_safe %>);
+                <% elsif report.instance_of? TableReport %>
+                    smap.initTableReport(<%= "#{dashboard.nil? ? 'null' : dashboard.id}, #{report.id}" %>);
+                <% elsif report.instance_of? KpiReport %>
+                    smap.initKpiReport(<%= "#{dashboard.nil? ? 'null' : dashboard.id}, #{report.id}" %>);
+                <% elsif report.instance_of? HeatMapReport %>
+                    // +++
+                <% end %>
+
+            <% end %>
+        <% end %>
+    });
+</script>

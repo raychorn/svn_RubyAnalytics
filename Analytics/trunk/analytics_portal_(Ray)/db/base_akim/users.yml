@@ -1,0 +1,152 @@
+
+--- 
+users: 
+  columns: 
+  - id
+  - first_name
+  - last_name
+  - email
+  - encrypted_password
+  - reset_password_token
+  - reset_password_sent_at
+  - remember_created_at
+  - sign_in_count
+  - current_sign_in_at
+  - last_sign_in_at
+  - current_sign_in_ip
+  - last_sign_in_ip
+  - created_at
+  - updated_at
+  - invitation_token
+  - invitation_sent_at
+  - invitation_limit
+  - invited_by_id
+  - invited_by_type
+  - global_admin
+  records: 
+  - - 1
+    - root
+    - user
+    - root@analytics.local
+    - $2a$10$bUUIacEpXSAOaN.ruF9MzOSjvESXYv7T8aZTeRQFd.wRgCJmVoojW
+    - 
+    - 
+    - 
+    - 40
+    - 2011-06-27 17:48:38 Z
+    - 2011-06-27 17:44:38 Z
+    - 127.0.0.1
+    - 127.0.0.1
+    - 2011-05-27 00:51:11 Z
+    - 2011-06-27 17:48:38 Z
+    - 
+    - 
+    - 
+    - 
+    - 
+    - true
+  - - 2
+    - admin
+    - user
+    - admin@analytics.local
+    - $2a$10$moroVz0iEjfofkAqFdO3HO69Lg0bxxhSBML2HWzLJjqJrsftdvDgu
+    - 
+    - 
+    - 
+    - 16
+    - 2011-06-27 17:48:04 Z
+    - 2011-06-27 17:40:11 Z
+    - 127.0.0.1
+    - 127.0.0.1
+    - 2011-05-27 00:51:11 Z
+    - 2011-06-27 17:48:04 Z
+    - 
+    - 
+    - 
+    - 
+    - 
+    - false
+  - - 3
+    - portal
+    - user
+    - portal@analytics.local
+    - $2a$10$ojgYWtjjENGKl3FJlHqAc.IBQ.0eYME4U6iA7xVDpDF9LEJ.CmjXm
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 2011-05-27 00:51:43 Z
+    - 2011-05-27 00:51:43 Z
+    - 
+    - 
+    - 
+    - 
+    - 
+    - false
+  - - 4
+    - Sergei
+    - Prutkin
+    - sprutkin@redacted.com
+    - $2a$10$C7iVqJRKzuhdP8JF9eR8w.ARj7mtvUjOOznZC9DAdjNnj3qYTOxBO
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 2011-05-27 00:51:43 Z
+    - 2011-05-27 00:51:43 Z
+    - 
+    - 
+    - 
+    - 
+    - 
+    - false
+  - - 5
+    - Tonya
+    - Hernandez
+    - thernandez2@redacted.com
+    - $2a$10$SwvcXgDUVBE/1uueAGxDp.DQ.BhFKgRQ1ZwnZU5fKAiih.pcZh5My
+    - 
+    - 
+    - 
+    - 0
+    - 
+    - 
+    - 
+    - 
+    - 2011-05-27 00:51:43 Z
+    - 2011-05-27 00:51:43 Z
+    - 
+    - 
+    - 
+    - 
+    - 
+    - false
+  - - 6
+    - David
+    - Terry
+    - dterry@redacted.com
+    - $2a$10$wSk2Kv8nAzILICIzqDqpvuwvQ.tN.a2t5nSZGD6C6cvgy2kv5OBpW
+    - 
+    - 
+    - 
+    - 2
+    - 2011-06-21 00:37:18 Z
+    - 2011-06-14 21:31:35 Z
+    - 127.0.0.1
+    - 127.0.0.1
+    - 2011-05-27 00:51:43 Z
+    - 2011-06-21 00:37:18 Z
+    - 
+    - 
+    - 
+    - 
+    - 
+    - false

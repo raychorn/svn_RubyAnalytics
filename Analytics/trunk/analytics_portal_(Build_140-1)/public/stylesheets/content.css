@@ -1,0 +1,17 @@
+li {
+display:inline;
+margin: 0px 20px;
+}
+
+.mine-button {
+    outline: 0;
+    margin: 0 4px 0 0;
+    padding: 0 1em;
+    height: 2em;
+    text-decoration: none !important;
+    cursor: pointer;
+    position: relative;
+    text-align: center;
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px
+}

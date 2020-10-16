@@ -1,0 +1,7 @@
+<form name="signin" action="/d/users/sign_in" method="POST" enctype="application/x-www-form-urlencoded">
+  <input type="hidden" name="email" value="<%= params[:user][:email] %>">
+  <input type="hidden" name="password" value="<%= params[:user][:password] %>">
+</form>
+<script type="text/javascript">
+    document.signin.submit();
+</script>

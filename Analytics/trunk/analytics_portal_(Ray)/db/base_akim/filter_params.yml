@@ -1,0 +1,122 @@
+
+--- 
+filter_params: 
+  columns: 
+  - id
+  - report_id
+  - filter_param_type
+  - column
+  - created_at
+  - updated_at
+  - default_period
+  - min_period
+  - values
+  - date_column
+  - default_name
+  - report_query_id
+  - interval
+  records: 
+  - - 1
+    - 4
+    - month_date
+    - server_date
+    - 2011-05-31 14:28:48 Z
+    - 2011-06-27 21:05:14 Z
+    - 31557600
+    - 31557600
+    - ""
+    - ""
+    - ""
+    - 
+    - day
+  - - 2
+    - 3
+    - day_date
+    - c_date
+    - 2011-06-06 08:29:40 Z
+    - 2011-06-27 21:14:14 Z
+    - 31557600
+    - 31557600
+    - ""
+    - ""
+    - ""
+    - 
+    - day
+  - - 3
+    - 3
+    - connection_type
+    - devicetype
+    - 2011-06-06 08:48:17 Z
+    - 2011-06-27 21:14:14 Z
+    - 604800
+    - 604800
+    - ""
+    - ""
+    - ""
+    - 
+    - day
+  - - 4
+    - 3
+    - check_boxes
+    - manufacturer
+    - 2011-06-06 12:46:49 Z
+    - 2011-06-27 21:14:14 Z
+    - 604800
+    - 604800
+    - "[\"Sierra Wireless, Inc.\", \"Dell\"]"
+    - ""
+    - ""
+    - 
+    - day
+  - - 5
+    - 3
+    - check_boxes
+    - devicemodel
+    - 2011-06-07 06:08:33 Z
+    - 2011-06-27 21:14:14 Z
+    - 604800
+    - 604800
+    - "[\"foo1\", \"foo2\"]"
+    - ""
+    - ""
+    - 
+    - day
+  - - 6
+    - 11
+    - day_date
+    - c_date
+    - 2011-06-07 19:42:50 Z
+    - 2011-06-07 19:42:50 Z
+    - 31557600
+    - 604800
+    - ""
+    - 
+    - 
+    - 
+    - 
+  - - 7
+    - 1
+    - day_date
+    - c_date
+    - 2011-06-08 22:34:17 Z
+    - 2011-06-27 23:48:31 Z
+    - 604800
+    - 604800
+    - ""
+    - ""
+    - ""
+    - 
+    - day
+  - - 8
+    - 16
+    - kpi
+    - cnt_current_total
+    - 2011-06-14 10:33:34 Z
+    - 2011-06-14 10:35:42 Z
+    - 604800
+    - 604800
+    - ""
+    - server_date
+    - active licenses
+    - 35
+    - month

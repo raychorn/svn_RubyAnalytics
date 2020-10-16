@@ -1,0 +1,20 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Name:</b>
+  <%= @data_source.name %>
+</p>
+
+<p>
+  <b>Url:</b>
+  <%= @data_source.url %>
+</p>
+
+<p>
+  <b>Database Name:</b>
+  <%= @data_source.database_name %>
+</p>
+
+
+<%= link_to 'Edit', edit_data_source_path(@data_source) %> |
+<%= link_to 'Back', data_sources_path %>

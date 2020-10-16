@@ -1,0 +1,8 @@
+<%= simple_form_for @filter_set do |form| %>
+  <div class="dialog-content">
+    <%= form.input :name, :input_html => { :size => 40 } %>
+    <%= form.input :description, :input_html => { :rows => 5, :cols => 40 } %>
+    <%= render :partial => 'filter_prefs/fields_for_dialog', :locals => {:form => form} %>
+  </div>
+  <%= render :partial => 'shared/dialog_footer', :locals => {:form => form, :cancel_path => filter_sets_path} %>
+<% end %>
